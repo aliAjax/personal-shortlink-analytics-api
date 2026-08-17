@@ -25,8 +25,8 @@ type AccessRecorder interface {
 }
 
 type Service struct {
-	links  LinkRepository
-	stats  AccessRecorder
+	links LinkRepository
+	stats AccessRecorder
 }
 
 func NewService(links LinkRepository, stats AccessRecorder) *Service {
@@ -41,7 +41,7 @@ func (s *Service) Resolve(ctx context.Context, code, referer, userAgent, ip stri
 		}
 		return model.Target{}, err
 	}
-	if link.ExpiresAt != nil && time.Now().After(*link.ExpiresAt) {
+	if time.Now().After(*link.ExpiresAt) {
 		return model.Target{}, ErrExpired
 	}
 	if err := s.stats.Record(ctx, accessmodel.RecordAccess{
