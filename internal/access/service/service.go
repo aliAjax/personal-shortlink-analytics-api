@@ -18,7 +18,7 @@ func NewService(repo repository.Repository) *Service {
 
 func (s *Service) Record(ctx context.Context, stat model.RecordAccess) error {
 	if err := s.repo.Create(ctx, stat); err != nil {
-		return fmt.Errorf("record access: %v", err)
+		return fmt.Errorf("record access: %w", err)
 	}
 	return nil
 }
@@ -26,11 +26,11 @@ func (s *Service) Record(ctx context.Context, stat model.RecordAccess) error {
 func (s *Service) LinkStats(ctx context.Context, linkID int64) (model.LinkStatsResponse, error) {
 	total, err := s.repo.CountByLink(ctx, linkID)
 	if err != nil {
-		return model.LinkStatsResponse{}, fmt.Errorf("count link access: %v", err)
+		return model.LinkStatsResponse{}, fmt.Errorf("count link access: %w", err)
 	}
 	recent, err := s.repo.ListRecentByLink(ctx, linkID, 20)
 	if err != nil {
-		return model.LinkStatsResponse{}, fmt.Errorf("list link access: %v", err)
+		return model.LinkStatsResponse{}, fmt.Errorf("list link access: %w", err)
 	}
 	return model.LinkStatsResponse{Total: total, Recent: toResponses(recent)}, nil
 }
@@ -38,19 +38,19 @@ func (s *Service) LinkStats(ctx context.Context, linkID int64) (model.LinkStatsR
 func (s *Service) Dashboard(ctx context.Context, userID int64) (model.DashboardResponse, error) {
 	totalLinks, err := s.repo.CountLinksByUser(ctx, userID)
 	if err != nil {
-		return model.DashboardResponse{}, fmt.Errorf("count user links: %v", err)
+		return model.DashboardResponse{}, fmt.Errorf("count user links: %w", err)
 	}
 	totalClicks, err := s.repo.CountByUser(ctx, userID)
 	if err != nil {
-		return model.DashboardResponse{}, fmt.Errorf("count user access: %v", err)
+		return model.DashboardResponse{}, fmt.Errorf("count user access: %w", err)
 	}
 	topLinks, err := s.repo.ListTopLinksByUser(ctx, userID, 10)
 	if err != nil {
-		return model.DashboardResponse{}, fmt.Errorf("list top links: %v", err)
+		return model.DashboardResponse{}, fmt.Errorf("list top links: %w", err)
 	}
 	recent, err := s.repo.ListRecentByUser(ctx, userID, 20)
 	if err != nil {
-		return model.DashboardResponse{}, fmt.Errorf("list recent access: %v", err)
+		return model.DashboardResponse{}, fmt.Errorf("list recent access: %w", err)
 	}
 	return model.NewDashboardResponse(totalLinks, totalClicks, topLinks, toResponses(recent)), nil
 }

@@ -51,10 +51,10 @@ func (s *Service) Create(ctx context.Context, userID int64, req model.CreateRequ
 		}
 		created, err := s.repo.Create(ctx, link)
 		if errors.Is(err, repository.ErrDuplicateCode) {
-			return model.ShortLink{}, fmt.Errorf("create custom link: %v", ErrDuplicateCode)
+			return model.ShortLink{}, fmt.Errorf("create custom link: %w", ErrDuplicateCode)
 		}
 		if err != nil {
-			return model.ShortLink{}, fmt.Errorf("create custom link: %v", err)
+			return model.ShortLink{}, fmt.Errorf("create custom link: %w", err)
 		}
 		return created, nil
 	}
@@ -77,20 +77,20 @@ func (s *Service) Create(ctx context.Context, userID int64, req model.CreateRequ
 			return created, nil
 		}
 		if !errors.Is(err, repository.ErrDuplicateCode) {
-			return model.ShortLink{}, fmt.Errorf("create generated link: %v", err)
+			return model.ShortLink{}, fmt.Errorf("create generated link: %w", err)
 		}
 		lastErr = err
 	}
 	if lastErr == nil {
 		lastErr = repository.ErrDuplicateCode
 	}
-	return model.ShortLink{}, fmt.Errorf("generate short code: %v", lastErr)
+	return model.ShortLink{}, fmt.Errorf("generate short code: %w", lastErr)
 }
 
 func (s *Service) List(ctx context.Context, userID int64) ([]model.ShortLinkWithStats, error) {
 	links, err := s.repo.ListByUser(ctx, userID)
 	if err != nil {
-		return nil, fmt.Errorf("list links: %v", err)
+		return nil, fmt.Errorf("list links: %w", err)
 	}
 	return links, nil
 }
@@ -98,7 +98,7 @@ func (s *Service) List(ctx context.Context, userID int64) ([]model.ShortLinkWith
 func (s *Service) Get(ctx context.Context, id, userID int64) (model.ShortLink, error) {
 	link, err := s.repo.FindByIDAndUser(ctx, id, userID)
 	if err != nil {
-		return model.ShortLink{}, fmt.Errorf("get link: %v", err)
+		return model.ShortLink{}, fmt.Errorf("get link: %w", err)
 	}
 	return link, nil
 }
@@ -106,7 +106,7 @@ func (s *Service) Get(ctx context.Context, id, userID int64) (model.ShortLink, e
 func (s *Service) Delete(ctx context.Context, id, userID int64) error {
 	deleted, err := s.repo.DeleteByIDAndUser(ctx, id, userID)
 	if err != nil {
-		return fmt.Errorf("delete link: %v", err)
+		return fmt.Errorf("delete link: %w", err)
 	}
 	if !deleted {
 		return ErrNotFound
