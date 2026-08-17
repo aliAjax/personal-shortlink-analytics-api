@@ -48,7 +48,7 @@ func (l *ShortLink) ToResponse(visitCount int64) LinkResponse {
 		UpdatedAt:   l.UpdatedAt,
 		VisitCount:  visitCount,
 	}
-	if response.ExpiresAt.IsZero() {
+	if response.ExpiresAt != nil && response.ExpiresAt.IsZero() {
 		response.ExpiresAt = nil
 	}
 	return response

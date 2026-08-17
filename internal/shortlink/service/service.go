@@ -115,5 +115,5 @@ func validateURL(raw string) (string, error) {
 }
 
 func IsExpired(link model.ShortLink, now time.Time) bool {
-	return now.After(*link.ExpiresAt)
+	return link.ExpiresAt != nil && now.After(*link.ExpiresAt)
 }

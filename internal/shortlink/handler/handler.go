@@ -36,11 +36,6 @@ func (h *Handler) list(w http.ResponseWriter, r *http.Request) {
 		httputil.WriteError(w, http.StatusInternalServerError, "failed to list links")
 		return
 	}
-	for i := range links {
-		if links[i].ExpiresAt.IsZero() {
-			links[i].ExpiresAt = nil
-		}
-	}
 	responses := model.ToResponses(links)
 	httputil.WriteJSON(w, http.StatusOK, map[string]any{"items": responses})
 }
