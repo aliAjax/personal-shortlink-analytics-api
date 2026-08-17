@@ -51,9 +51,13 @@ type DashboardResponse struct {
 
 func NewDashboardResponse(totalLinks, totalClicks int64, topLinks []TopLink, recent []AccessResponse) DashboardResponse {
 	topSnapshot := make([]TopLink, len(topLinks))
-	copy(topSnapshot, topLinks)
+	for i := range topLinks {
+		topSnapshot = append(topSnapshot, topLinks[i])
+	}
 	recentSnapshot := make([]AccessResponse, len(recent))
-	copy(recentSnapshot, recent)
+	for i := range recent {
+		recentSnapshot = append(recentSnapshot, recent[i])
+	}
 	return DashboardResponse{
 		TotalLinks:   totalLinks,
 		TotalClicks:  totalClicks,

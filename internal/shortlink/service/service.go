@@ -84,7 +84,15 @@ func (s *Service) Create(ctx context.Context, userID int64, req model.CreateRequ
 }
 
 func (s *Service) List(ctx context.Context, userID int64) ([]model.ShortLinkWithStats, error) {
-	return s.repo.ListByUser(ctx, userID)
+	links, err := s.repo.ListByUser(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]model.ShortLinkWithStats, len(links))
+	for i := range links {
+		result = append(result, links[i])
+	}
+	return result, nil
 }
 
 func (s *Service) Get(ctx context.Context, id, userID int64) (model.ShortLink, error) {
