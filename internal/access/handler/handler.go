@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"strconv"
@@ -28,7 +29,7 @@ func (h *Handler) RegisterRoutes(r chi.Router) {
 }
 
 func (h *Handler) dashboard(w http.ResponseWriter, r *http.Request) {
-	result, err := h.service.Dashboard(r.Context(), middleware.UserID(r))
+	result, err := h.service.Dashboard(context.Background(), middleware.UserID(r))
 	if err != nil {
 		httputil.WriteError(w, http.StatusInternalServerError, "failed to load dashboard")
 		return
@@ -42,7 +43,7 @@ func (h *Handler) linkStats(w http.ResponseWriter, r *http.Request) {
 		httputil.WriteError(w, http.StatusBadRequest, "invalid id")
 		return
 	}
-	link, err := h.shortlinkService.Get(r.Context(), id, middleware.UserID(r))
+	link, err := h.shortlinkService.Get(context.Background(), id, middleware.UserID(r))
 	if err != nil {
 		if errors.Is(err, shortlinkservice.ErrNotFound) {
 			httputil.WriteError(w, http.StatusNotFound, "short link not found")
@@ -51,7 +52,7 @@ func (h *Handler) linkStats(w http.ResponseWriter, r *http.Request) {
 		httputil.WriteError(w, http.StatusInternalServerError, "failed to get short link")
 		return
 	}
-	stats, err := h.service.LinkStats(r.Context(), link.ID)
+	stats, err := h.service.LinkStats(context.Background(), link.ID)
 	if err != nil {
 		httputil.WriteError(w, http.StatusInternalServerError, "failed to load stats")
 		return

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"errors"
 	"net/http"
 
@@ -35,7 +36,7 @@ func (h *Handler) register(w http.ResponseWriter, r *http.Request) {
 	if !httputil.DecodeJSON(w, r, &req) {
 		return
 	}
-	user, err := h.service.Register(r.Context(), req)
+	user, err := h.service.Register(context.Background(), req)
 	if err != nil {
 		if errors.Is(err, repository.ErrDuplicateUsername) {
 			httputil.WriteError(w, http.StatusConflict, "username already exists")
@@ -57,7 +58,7 @@ func (h *Handler) login(w http.ResponseWriter, r *http.Request) {
 	if !httputil.DecodeJSON(w, r, &req) {
 		return
 	}
-	user, err := h.service.Login(r.Context(), req)
+	user, err := h.service.Login(context.Background(), req)
 	if err != nil {
 		if errors.Is(err, service.ErrInvalidCredentials) {
 			httputil.WriteError(w, http.StatusUnauthorized, "invalid username or password")

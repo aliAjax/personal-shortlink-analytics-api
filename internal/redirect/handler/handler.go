@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"errors"
 	"net"
 	"net/http"
@@ -30,7 +31,7 @@ func (h *Handler) redirect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	target, err := h.service.Resolve(
-		r.Context(),
+		context.Background(),
 		code,
 		r.Referer(),
 		r.UserAgent(),
