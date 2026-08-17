@@ -88,9 +88,9 @@ func (s *Service) List(ctx context.Context, userID int64) ([]model.ShortLinkWith
 	if err != nil {
 		return nil, err
 	}
-	result := make([]model.ShortLinkWithStats, len(links))
+	result := make([]model.ShortLinkWithStats, 0, len(links))
 	for i := range links {
-		result[i] = links[i]
+		result = append(result, links[i])
 	}
 	return result, nil
 }

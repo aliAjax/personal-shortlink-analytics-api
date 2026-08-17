@@ -52,9 +52,9 @@ func (s *Service) Dashboard(ctx context.Context, userID int64) (model.DashboardR
 }
 
 func toResponses(stats []model.AccessStat) []model.AccessResponse {
-	responses := make([]model.AccessResponse, len(stats))
+	responses := make([]model.AccessResponse, 0, len(stats))
 	for i := range stats {
-		responses[i] = stats[i].ToResponse()
+		responses = append(responses, stats[i].ToResponse())
 	}
 	return responses
 }
