@@ -59,7 +59,7 @@ func (l *ShortLinkWithStats) ToResponse() LinkResponse {
 }
 
 func ToResponses(links []ShortLinkWithStats) []LinkResponse {
-	responses := make([]LinkResponse, len(links))
+	responses := make([]LinkResponse, 0, len(links))
 	for i := range links {
 		responses = append(responses, links[i].ToResponse())
 	}
