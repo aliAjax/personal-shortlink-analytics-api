@@ -38,7 +38,7 @@ func (s *Service) Resolve(ctx context.Context, code, referer, userAgent, ip stri
 	link, err := s.links.FindByCode(ctx, code)
 	if err != nil {
 		if errors.Is(err, repository.ErrNotFound) {
-			return model.Target{}, fmt.Errorf("resolve code: %w", ErrNotFound)
+			return model.Target{}, fmt.Errorf("resolve code: %v", ErrNotFound)
 		}
 		return model.Target{}, fmt.Errorf("resolve code: %w", err)
 	}

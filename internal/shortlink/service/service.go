@@ -84,7 +84,7 @@ func (s *Service) Create(ctx context.Context, userID int64, req model.CreateRequ
 	if lastErr == nil {
 		lastErr = repository.ErrDuplicateCode
 	}
-	return model.ShortLink{}, fmt.Errorf("generate short code: %w", lastErr)
+	return model.ShortLink{}, fmt.Errorf("generate short code: %v", lastErr)
 }
 
 func (s *Service) List(ctx context.Context, userID int64) ([]model.ShortLinkWithStats, error) {
