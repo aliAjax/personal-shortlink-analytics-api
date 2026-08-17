@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"errors"
 	"net/http"
 	"strconv"
@@ -32,7 +31,7 @@ func (h *Handler) RegisterRoutes(r chi.Router) {
 }
 
 func (h *Handler) list(w http.ResponseWriter, r *http.Request) {
-	links, err := h.service.List(context.Background(), middleware.UserID(r))
+	links, err := h.service.List(r.Context(), middleware.UserID(r))
 	if err != nil {
 		httputil.WriteError(w, http.StatusInternalServerError, "failed to list links")
 		return
@@ -46,7 +45,7 @@ func (h *Handler) create(w http.ResponseWriter, r *http.Request) {
 	if !httputil.DecodeJSON(w, r, &req) {
 		return
 	}
-	link, err := h.service.Create(context.Background(), middleware.UserID(r), req)
+	link, err := h.service.Create(r.Context(), middleware.UserID(r), req)
 	if err != nil {
 		switch {
 		case errors.Is(err, service.ErrDuplicateCode):
@@ -68,7 +67,7 @@ func (h *Handler) get(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	link, err := h.service.Get(context.Background(), id, middleware.UserID(r))
+	link, err := h.service.Get(r.Context(), id, middleware.UserID(r))
 	if err != nil {
 		if errors.Is(err, service.ErrNotFound) {
 			httputil.WriteError(w, http.StatusNotFound, "short link not found")
@@ -85,7 +84,7 @@ func (h *Handler) delete(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	if err := h.service.Delete(context.Background(), id, middleware.UserID(r)); err != nil {
+	if err := h.service.Delete(r.Context(), id, middleware.UserID(r)); err != nil {
 		if errors.Is(err, service.ErrNotFound) {
 			httputil.WriteError(w, http.StatusNotFound, "short link not found")
 			return
