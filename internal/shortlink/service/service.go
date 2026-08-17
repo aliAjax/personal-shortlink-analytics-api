@@ -84,13 +84,10 @@ func (s *Service) Create(ctx context.Context, userID int64, req model.CreateRequ
 }
 
 func (s *Service) List(ctx context.Context, userID int64) ([]model.ShortLinkWithStats, error) {
-	links, err := s.repo.ListByUser(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-	result := make([]model.ShortLinkWithStats, len(links))
-	copy(result, links)
-	return result, nil
+	// The repository returns a freshly allocated slice per call; return it
+	// directly instead of routing it through a shared scratch slice, which
+	// would alias backing arrays across concurrent List requests.
+	return s.repo.ListByUser(ctx, userID)
 }
 
 func (s *Service) Get(ctx context.Context, id, userID int64) (model.ShortLink, error) {

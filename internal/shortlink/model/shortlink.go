@@ -59,6 +59,9 @@ func (l *ShortLinkWithStats) ToResponse() LinkResponse {
 }
 
 func ToResponses(links []ShortLinkWithStats) []LinkResponse {
+	// Allocate a fresh slice per call. A shared package-level scratch slice
+	// aliased backing arrays across concurrent list requests, letting one
+	// user's short codes bleed into another's response.
 	responses := make([]LinkResponse, len(links))
 	for i := range links {
 		responses[i] = links[i].ToResponse()

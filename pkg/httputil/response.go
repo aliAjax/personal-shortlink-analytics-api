@@ -10,20 +10,19 @@ type ErrorResponse struct {
 	Error string `json:"error"`
 }
 
-// WriteJSON serializes payload as JSON into the response. A per-call buffer is
-// used instead of a shared package-level one so concurrent handlers never cross
-// contaminate each other's bodies.
 func WriteJSON(w http.ResponseWriter, status int, payload any) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	var responseBuffer bytes.Buffer
+	// Use a per-call buffer so concurrent requests never share scratch space
+	// (a shared buffer caused JSON bodies to bleed across responses under load).
+	var buf bytes.Buffer
 	if payload != nil {
-		if err := json.NewEncoder(&responseBuffer).Encode(payload); err != nil {
+		if err := json.NewEncoder(&buf).Encode(payload); err != nil {
 			http.Error(w, `{"error":"failed to encode response"}`, http.StatusInternalServerError)
 			return
 		}
 	}
 	w.WriteHeader(status)
-	if _, err := w.Write(responseBuffer.Bytes()); err != nil {
+	if _, err := w.Write(buf.Bytes()); err != nil {
 		// The header is already written, so log-only is the only safe fallback.
 		http.Error(w, `{"error":"failed to encode response"}`, http.StatusInternalServerError)
 	}

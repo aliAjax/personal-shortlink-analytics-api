@@ -52,6 +52,9 @@ func (s *Service) Dashboard(ctx context.Context, userID int64) (model.DashboardR
 }
 
 func toResponses(stats []model.AccessStat) []model.AccessResponse {
+	// Allocate a fresh slice per call. Reusing a package-level scratch slice
+	// caused Dashboard/LinkStats responses to share backing arrays across
+	// concurrent requests, leaking one user's rows into another's payload.
 	responses := make([]model.AccessResponse, len(stats))
 	for i := range stats {
 		responses[i] = stats[i].ToResponse()
