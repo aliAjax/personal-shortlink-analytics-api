@@ -63,7 +63,7 @@ func TestServicePreservesRepositoryErrors(t *testing.T) {
 func TestConcurrentDashboardResultsStayIsolated(t *testing.T) {
 	service := NewService(&fakeRepository{})
 	var wg sync.WaitGroup
-	errCh := make(chan error, 64)
+	errCh := make(chan error, 256)
 	for userID := int64(1); userID <= 64; userID++ {
 		userID := userID
 		wg.Add(1)
