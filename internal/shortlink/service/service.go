@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/url"
 	"regexp"
 	"strings"
@@ -51,12 +50,9 @@ func (s *Service) Create(ctx context.Context, userID int64, req model.CreateRequ
 		}
 		created, err := s.repo.Create(ctx, link)
 		if errors.Is(err, repository.ErrDuplicateCode) {
-			return model.ShortLink{}, fmt.Errorf("create custom link: %v", ErrDuplicateCode)
+			return model.ShortLink{}, ErrDuplicateCode
 		}
-		if err != nil {
-			return model.ShortLink{}, fmt.Errorf("create custom link: %v", err)
-		}
-		return created, nil
+		return created, err
 	}
 
 	var lastErr error
@@ -77,36 +73,28 @@ func (s *Service) Create(ctx context.Context, userID int64, req model.CreateRequ
 			return created, nil
 		}
 		if !errors.Is(err, repository.ErrDuplicateCode) {
-			return model.ShortLink{}, fmt.Errorf("create generated link: %v", err)
+			return model.ShortLink{}, err
 		}
 		lastErr = err
 	}
 	if lastErr == nil {
 		lastErr = repository.ErrDuplicateCode
 	}
-	return model.ShortLink{}, fmt.Errorf("generate short code: %v", lastErr)
+	return model.ShortLink{}, lastErr
 }
 
 func (s *Service) List(ctx context.Context, userID int64) ([]model.ShortLinkWithStats, error) {
-	links, err := s.repo.ListByUser(ctx, userID)
-	if err != nil {
-		return nil, fmt.Errorf("list links: %v", err)
-	}
-	return links, nil
+	return s.repo.ListByUser(ctx, userID)
 }
 
 func (s *Service) Get(ctx context.Context, id, userID int64) (model.ShortLink, error) {
-	link, err := s.repo.FindByIDAndUser(ctx, id, userID)
-	if err != nil {
-		return model.ShortLink{}, fmt.Errorf("get link: %v", err)
-	}
-	return link, nil
+	return s.repo.FindByIDAndUser(ctx, id, userID)
 }
 
 func (s *Service) Delete(ctx context.Context, id, userID int64) error {
 	deleted, err := s.repo.DeleteByIDAndUser(ctx, id, userID)
 	if err != nil {
-		return fmt.Errorf("delete link: %v", err)
+		return err
 	}
 	if !deleted {
 		return ErrNotFound

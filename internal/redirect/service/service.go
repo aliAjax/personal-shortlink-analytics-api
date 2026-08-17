@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	accessmodel "github.com/example/shortlink-api/internal/access/model"
@@ -26,8 +25,8 @@ type AccessRecorder interface {
 }
 
 type Service struct {
-	links LinkRepository
-	stats AccessRecorder
+	links  LinkRepository
+	stats  AccessRecorder
 }
 
 func NewService(links LinkRepository, stats AccessRecorder) *Service {
@@ -38,9 +37,9 @@ func (s *Service) Resolve(ctx context.Context, code, referer, userAgent, ip stri
 	link, err := s.links.FindByCode(ctx, code)
 	if err != nil {
 		if errors.Is(err, repository.ErrNotFound) {
-			return model.Target{}, fmt.Errorf("resolve code: %v", ErrNotFound)
+			return model.Target{}, ErrNotFound
 		}
-		return model.Target{}, fmt.Errorf("resolve code: %v", err)
+		return model.Target{}, err
 	}
 	if link.ExpiresAt != nil && time.Now().After(*link.ExpiresAt) {
 		return model.Target{}, ErrExpired
@@ -51,7 +50,7 @@ func (s *Service) Resolve(ctx context.Context, code, referer, userAgent, ip stri
 		UserAgent:   userAgent,
 		IPAddress:   ip,
 	}); err != nil {
-		return model.Target{}, fmt.Errorf("record access: %v", err)
+		return model.Target{}, err
 	}
 	return model.Target{OriginalURL: link.OriginalURL}, nil
 }
