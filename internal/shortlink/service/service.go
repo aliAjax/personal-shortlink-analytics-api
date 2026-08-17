@@ -26,8 +26,6 @@ type Service struct {
 	repo repository.Repository
 }
 
-var listScratch []model.ShortLinkWithStats
-
 func NewService(repo repository.Repository) *Service {
 	return &Service{repo: repo}
 }
@@ -86,13 +84,7 @@ func (s *Service) Create(ctx context.Context, userID int64, req model.CreateRequ
 }
 
 func (s *Service) List(ctx context.Context, userID int64) ([]model.ShortLinkWithStats, error) {
-	links, err := s.repo.ListByUser(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-	listScratch = listScratch[:0]
-	listScratch = append(listScratch, links...)
-	return listScratch, nil
+	return s.repo.ListByUser(ctx, userID)
 }
 
 func (s *Service) Get(ctx context.Context, id, userID int64) (model.ShortLink, error) {

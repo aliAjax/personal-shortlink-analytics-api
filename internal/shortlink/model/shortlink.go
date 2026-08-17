@@ -2,8 +2,6 @@ package model
 
 import "time"
 
-var responseScratch []LinkResponse
-
 type ShortLink struct {
 	ID          int64
 	UserID      int64
@@ -61,9 +59,9 @@ func (l *ShortLinkWithStats) ToResponse() LinkResponse {
 }
 
 func ToResponses(links []ShortLinkWithStats) []LinkResponse {
-	responseScratch = responseScratch[:0]
+	responses := make([]LinkResponse, 0, len(links))
 	for i := range links {
-		responseScratch = append(responseScratch, links[i].ToResponse())
+		responses = append(responses, links[i].ToResponse())
 	}
-	return responseScratch
+	return responses
 }

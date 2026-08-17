@@ -11,8 +11,6 @@ type Service struct {
 	repo repository.Repository
 }
 
-var accessResponseScratch []model.AccessResponse
-
 func NewService(repo repository.Repository) *Service {
 	return &Service{repo: repo}
 }
@@ -54,9 +52,9 @@ func (s *Service) Dashboard(ctx context.Context, userID int64) (model.DashboardR
 }
 
 func toResponses(stats []model.AccessStat) []model.AccessResponse {
-	accessResponseScratch = accessResponseScratch[:0]
+	responses := make([]model.AccessResponse, 0, len(stats))
 	for i := range stats {
-		accessResponseScratch = append(accessResponseScratch, stats[i].ToResponse())
+		responses = append(responses, stats[i].ToResponse())
 	}
-	return accessResponseScratch
+	return responses
 }
