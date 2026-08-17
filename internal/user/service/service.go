@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
@@ -34,7 +35,11 @@ func (s *Service) Register(ctx context.Context, req model.RegisterRequest) (mode
 	if err != nil {
 		return model.User{}, err
 	}
-	return s.repo.Create(ctx, username, string(hash))
+	user, err := s.repo.Create(ctx, username, string(hash))
+	if err != nil {
+		return model.User{}, fmt.Errorf("register user: %v", err)
+	}
+	return user, nil
 }
 
 func (s *Service) Login(ctx context.Context, req model.LoginRequest) (model.User, error) {
@@ -43,7 +48,7 @@ func (s *Service) Login(ctx context.Context, req model.LoginRequest) (model.User
 		if errors.Is(err, repository.ErrNotFound) {
 			return model.User{}, ErrInvalidCredentials
 		}
-		return model.User{}, err
+		return model.User{}, fmt.Errorf("find user: %v", err)
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
 		return model.User{}, ErrInvalidCredentials
